@@ -1,0 +1,86 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+@font-face {
+  font-family: 'iran-sans';
+  src: url('./assets/fonts/IRANSansXBlack.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+a{
+  list-style-type: none;
+  text-decoration: none;
+  color: #fff;
+}
+.IdentityLayout{
+  background: radial-gradient(ellipse at bottom, #6441a4 0%, #090a0f 100%);
+}
+.sidebar {
+  width: 250px;
+  transition: width 0.3s ease;
+  background: linear-gradient(45deg, #FF8E53 30%, #FE6B8B 90%);
+}
+
+.collapsed {
+  width: 0;
+  overflow: hidden;
+}
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+body {
+  height: 100vh !important;
+  overflow: hidden;
+  direction: rtl;
+  
+}
+
+/* #root {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+} */
+
+.container {
+  /* flex: 1; */
+  /* display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; */
+  color: #ffffff;
+  /* background-color: red; */
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 60px;
+  /* height: 100vh; */
+}
+
+.card {
+  background-color: #1a1a1a;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 10px;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+  width: 300px;
+  height: 400px;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+footer {
+  background-color: #1a1a1a;
+  padding: 20px 0;
+  text-align: center;
+}
