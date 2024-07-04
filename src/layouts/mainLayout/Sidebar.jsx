@@ -6,8 +6,19 @@ import { Grid, Typography } from "@mui/material";
 import muneItemSideBar from "../../data/muneItemSideBar";
 
 const Sidebar = () => {
-  const { showSidebar, toggleSidebar } = useAppContext();
-const{userInfo}=useAppContext()
+  const { showSidebar, toggleSidebar,userInfo } = useAppContext();
+  const filteredMuneItemSideBar = muneItemSideBar.map((section) => {
+    if (section.id === 1) {
+      return {
+        ...section,
+        mune: section.mune.filter(
+          (item) => !(userInfo?.studentId > 0 && item.id === 3)
+        ),
+      };
+    }
+    return section;
+  });
+
   return (
     <Grid
       position={{ xs: "absolute", sm: "none" }}
@@ -28,7 +39,7 @@ const{userInfo}=useAppContext()
           </Typography>
         </a>
         <ul style={{ listStyleType: "none", padding: "30px" }}>
-          {muneItemSideBar.map((item) => (
+          {filteredMuneItemSideBar.map((item) => (
             <Grid className="fw-bolder" key={item.title}>
               <li style={{ margin: "10px 0", fontFamily: "iran-sans" }}>
                 {item.title}
