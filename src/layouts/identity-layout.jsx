@@ -7,14 +7,15 @@ import { Box, Grid } from "@mui/material";
 function IdentityLayout() {
   const myStyle = {
     backgroundImage:'../assets/images/animated.gif',
-    // height: "100vh",
+    height: "100vh",
     // marginTop: "-70px",
     fontSize: "50px",
     backgroundSize: "cover",
     backgroundRepeat: "no-repeat",
+    
 };
   return (
-    <Grid container direction="column" style={{ minHeight: '100vh' }} sx={myStyle}  className="IdentityLayout">
+    <Grid display={'flex'} flexDirection="column" style={{ minHeight: '100vh' }} sx={myStyle}  className="IdentityLayout">
       <HeaderAccount />
       <Grid item style={{ flexGrow: 1, overflowY: 'auto' }}>
         <Box  height={'100%'}>
