@@ -36,7 +36,7 @@ const handleBoxClick = (item) => {
   console.log(selectedType,'selectedType.type')
 
   return (
-    <Grid id="root">
+    <Grid display={'flex'} justifyContent={'center'} alignItems={'center'}>
       {!showForm ? (
         <Grid className="container">
           <Typography fontFamily={"iran-sans"} fontSize={"24px"}>
