@@ -36,7 +36,11 @@ const MainLayout = () => {
         </Grid>
       )}
 
-      <Grid className="main" style={{  height: "100vh" }}>
+      <Grid
+        item
+        className="main"
+        style={{ flexGrow: 1, height: "100vh", overflow: "auto" }}
+      >
         <Grid
           position={"fixed"}
           left={0}
@@ -49,20 +53,26 @@ const MainLayout = () => {
 
         <Grid
           display={"flex"}
-          // bgcolor={"red"}
-          // mt={1}
           flexDirection={"column"}
-          // alignItems={"space-between"}
           justifyContent={"space-between"}
           style={{ minHeight: "100vh" }}
-          width={showSidebar? '83vw':'100vw'}
+          width={showSidebar ? "83vw" : "100vw"}
         >
-          <Grid className="content" style={{ paddingTop: "64px" }}>
-            <Grid mr={2}>
+          <Grid
+            container
+            direction={"column"}
+            justifyContent={"space-between"}
+            style={{ minHeight: "100vh", paddingTop: "64px", overflow: "auto" }}
+          >
+            <Grid
+              item
+              className="content"
+              style={{ flexGrow: 1, paddingRight: "16px", overflow: "auto" }}
+            >
               <Outlet />
             </Grid>
+            <Footer />
           </Grid>
-          <Footer />
         </Grid>
       </Grid>
     </Grid>
