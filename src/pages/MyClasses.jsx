@@ -20,9 +20,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../contexts/app/AppContext";
 import classroom from "../assets/images/Classroom.jpg";
-
+import noClasses from '../assets/images/noClassses.webp'
 import EditCourseDialog from "../components/EditeCourseDialog";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast } from "react-toastify";
 function MyClasses() {
   const [classes, setClasses] = useState([]);
   const [open, setOpen] = useState(false);
@@ -36,7 +36,7 @@ function MyClasses() {
     setIsEditModalOpen(true);
     setEditeCourse(course);
   };
-
+  console.log(classes);
   const loadCourses = () => {
     setLoading(true);
     fetch("https://assessment.darkube.app/api/Course/Course", {
@@ -61,16 +61,16 @@ function MyClasses() {
         setLoading(false);
       });
   };
-  
+
   useEffect(() => {
     loadCourses();
   }, [userInfo.token]);
-  
+
   const handleCloseModal = () => {
     setIsEditModalOpen(false);
     loadCourses(); // بارگیری مجدد داده‌ها پس از بستن مودال
   };
-  
+
   useEffect(() => {
     fetch("https://assessment.darkube.app/api/Course/Course", {
       method: "GET",
@@ -108,106 +108,153 @@ function MyClasses() {
 
   const handleDeleteCourse = async () => {
     try {
-      let url = '';
-      let method = 'DELETE';
+      let url = "";
+      let method = "DELETE";
       let body = null;
-  
-      if (userInfo.roleId ===1) {
-        url = 'https://assessment.darkube.app/api/Course/DeteteCourse';
-        method = 'POST';
+
+      if (userInfo.roleId === 1) {
+        url = "https://assessment.darkube.app/api/Course/DeteteCourse";
+        method = "POST";
         body = JSON.stringify({ courseId: currentCourse?.courseId });
       } else {
-        url = 'https://assessment.darkube.app/api/Course/LeavingClass';
+        url = "https://assessment.darkube.app/api/Course/LeavingClass";
         body = JSON.stringify({ courseId: currentCourse?.courseId });
       }
-  
+
       const response = await fetch(url, {
         method,
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${userInfo.token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userInfo.token}`,
         },
         body,
       });
-  
+
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`HTTP error! Status: ${response.status}, Response: ${errorText}`);
+        throw new Error(
+          `HTTP error! Status: ${response.status}, Response: ${errorText}`
+        );
       }
-  
+
       const data = await response.json();
-      setOpen(false)
+      setOpen(false);
       toast.success(data?.message);
-      setClasses(data?.result)
+      setClasses(data?.result);
     } catch (err) {
-      console.error('Error:', err);
+      console.error("Error:", err);
       toast.error(`Error: ${err.message}`);
     }
   };
-  
 
   const handleClassClick = (courseId) => {
     // navigate(`/class/${courseId}/assessments`);
   };
-  const skeletonCount = classes.length > 0 ? classes.length : 5; 
-  console.log(skeletonCount)
+  const skeletonCount = classes.length > 0 ? classes.length : 5;
+  console.log(skeletonCount);
   return (
-    <Grid container gap={2} flexWrap={'wrap'} sx={{ padding: 2 }}>
-      <ToastContainer/>
-      {loading
-        ?  Array.from(new Array(skeletonCount)).map((_, index) => (
-            <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
-              <Card raised>
-                <Skeleton variant="rectangular" width="100%" height={140} />
-                <CardContent>
-                  <Skeleton variant="text" width="60%" />
-                  <Skeleton variant="text" />
-                  <Skeleton variant="text" width="80%" />
-                </CardContent>
-              </Card>
-            </Grid>
-          ))
-        : classes.map((course) => (
-            <Grid item key={course.courseId} width={{xs:'100%',sm:'48%',md:'23.8%'}} xs={12} sm={6} md={4} lg={3}>
-              <Card
-                raised
-                sx={{
-                  "&:hover": {
-                    transform: "scale(1.05)",
-                    transition: "transform 0.3s",
-                  },
-                }}
+    <Grid container gap={2} flexWrap={"wrap"} sx={{ padding: 2 }}>
+      <ToastContainer />
+      {loading ? (
+        Array.from(new Array(skeletonCount)).map((_, index) => (
+          <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
+            <Card raised>
+              <Skeleton variant="rectangular" width="100%" height={140} />
+              <CardContent>
+                <Skeleton variant="text" width="60%" />
+                <Skeleton variant="text" />
+                <Skeleton variant="text" width="80%" />
+              </CardContent>
+            </Card>
+          </Grid>
+        ))
+      ) : (
+        <>
+          {classes.length > 0 ? (
+            <>
+             { classes.map((course) => (
+              <Grid
+                item
+                key={course.courseId}
+                width={{ xs: "100%", sm: "48%", md: "23.8%" }}
+                xs={12}
+                sm={6}
+                md={4}
+                lg={3}
               >
-                <CardActionArea
-                  onClick={() => handleClassClick(course.courseId)}
+                <Card
+                  raised
+                  sx={{
+                    "&:hover": {
+                      transform: "scale(1.05)",
+                      transition: "transform 0.3s",
+                    },
+                  }}
                 >
-                  <CardMedia
-                    component="img"
-                    height="140"
-                    image={classroom}
-                    alt={course.title}
-                  />
-                  <CardContent>
-                    <Typography gutterBottom variant="h5" component="div">
-                      {course.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {course.description}
-                    </Typography>
-                  </CardContent>
-                </CardActionArea>
-                <CardActionArea>
-                  <IconButton onClick={() => handleEditClick(course)}>
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton onClick={() => handleOpenDialog(course)}>
-                    <DeleteIcon />
-                  </IconButton>
-                </CardActionArea>
-              </Card>
-            </Grid>
-          ))}
-          
+                  <CardActionArea
+                    onClick={() => handleClassClick(course.courseId)}
+                  >
+                    <CardMedia
+                      component="img"
+                      height="140"
+                      image={classroom}
+                      alt={course.title}
+                    />
+                    <CardContent>
+                      <Typography gutterBottom variant="h5" component="div">
+                        {course.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {course.description}
+                      </Typography>
+                    </CardContent>
+                  </CardActionArea>
+                  <CardActionArea>
+                    {userInfo?.studentId > 0 ? null : (
+                      <IconButton onClick={() => handleEditClick(course)}>
+                        <EditIcon />
+                      </IconButton>
+                    )}
+                    <IconButton onClick={() => handleOpenDialog(course)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </CardActionArea>
+                </Card>
+              </Grid>
+              ))}
+            </>
+          ) : (
+            <Typography
+              fontFamily={"iran-sans"}
+              textAlign={"center"}
+              lineHeight={2}
+              color={"red"}
+              maxWidth={500}
+              margin={'auto'}
+            >
+              {userInfo?.studentId > 0 ? (
+                <>
+                  دانشجوی عزیز جناب آقای {userInfo.name} {userInfo.family} شما
+                  عضو هیچ کلاسی نیستید
+
+                  <img src={noClasses}alt="بدون کلاس" style={{width:'100%',borderRadius:'20px',marginTop:'30px'}}/>
+                </>
+              ) : (
+                <>
+                  استاد عزیز جناب آقای {userInfo.name} {userInfo.family} ضمن خیر
+                  مقدم و خوش آمد گویی به شما ,متاسفانه شما تا به کنون هیچ کلاسی
+                  رو ایجاد نکرده اید لطفا برای استفاده از سایت و خدمات انلاین
+                  مدیریت تکالیف درسی ,کلاس خود را ایجاد کنید. با تشکر تیم توسعه دهنده
+                  سامانه مدیریت آنلاین تکالیف درسی
+
+                  <img src={noClasses}alt="بدون کلاس" style={{width:'100%',borderRadius:'20px'}}/>
+                </>
+              )}
+            </Typography>
+          )}
+        </>
+      )}
+
       <Dialog
         open={open}
         onClose={handleCloseDialog}
@@ -230,7 +277,10 @@ function MyClasses() {
       </Dialog>
       <Dialog open={isEditModalOpen} onClose={handleCloseModal}>
         <DialogContent>
-          <EditCourseDialog editCourse={editCourse}handleCloseModal={handleCloseModal} />
+          <EditCourseDialog
+            editCourse={editCourse}
+            handleCloseModal={handleCloseModal}
+          />
         </DialogContent>
       </Dialog>
     </Grid>
