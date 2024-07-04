@@ -162,10 +162,11 @@ function SignupForm({ onCancel, type, roleId }) {
   console.log(formData, "formData");
   return (
     <form onSubmit={handleSubmit}>
-      <Box className={styles.signupCard} sx={{ padding: 3 }}>
+      <Box className={styles.signupCard} sx={{ padding: 3 }} >
         <Grid
           display={"flex"}
           flexDirection={"column"}
+          justifyContent={"space-between"}
           alignItems={"space-between"}
           height={"100%"}
         >
@@ -175,7 +176,7 @@ function SignupForm({ onCancel, type, roleId }) {
             my={4}
             display={"flex"}
             flexDirection={"column"}
-            justifyContent={"center"}
+            justifyContent={"space-between"}
             alignItems={"center"}
           >
             <AccountCircle fontSize="40px" />
@@ -339,8 +340,8 @@ function SignupForm({ onCancel, type, roleId }) {
             )}
           </Grid>
 
-          <Grid display={"flex"} gap={1} item xs={12}>
-            <Grid item xs={6}>
+          <Grid display={"flex"} justifyContent={'space-between'} gap={1} item xs={12}>
+            <Grid item xs={6} width={'50%'}>
               <Button
                 variant="contained"
                 fullWidth
@@ -350,7 +351,7 @@ function SignupForm({ onCancel, type, roleId }) {
                 ثبت نام
               </Button>
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={6} width={'50%'}>
               <Button
                 onClick={onCancel}
                 variant="contained"
