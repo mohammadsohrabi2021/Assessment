@@ -206,11 +206,11 @@ function MyClasses() {
                         component="img"
                         height="140"
                         image={classroom}
-                        alt={course.title}
+                        alt={course?.title}
                       />
                       <CardContent>
                         <Typography gutterBottom variant="h5" component="div">
-                          {course.title}
+                          {course?.title}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                           {course.description}
@@ -227,7 +227,7 @@ function MyClasses() {
                         <DeleteIcon />
                       </IconButton>
                       <Link
-                        to={`https://assessment-front.darkube.app/myClasses/${course?.courseId}`}
+                        to={`http://localhost:3000/myClasses/${course?.courseId}`}
                       >
                         <IconButton>
                           <VisibilityIcon />
