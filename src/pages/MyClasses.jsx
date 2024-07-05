@@ -17,12 +17,15 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAppContext } from "../contexts/app/AppContext";
 import classroom from "../assets/images/Classroom.jpg";
-import noClasses from '../assets/images/noClassses.webp'
+import noClasses from "../assets/images/noClassses.webp";
 import EditCourseDialog from "../components/EditeCourseDialog";
 import { ToastContainer, toast } from "react-toastify";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import CopyAllIcon from "@mui/icons-material/CopyAll";
+import ModaleShareLink from "../components/ModaleShareLink";
 function MyClasses() {
   const [classes, setClasses] = useState([]);
   const [open, setOpen] = useState(false);
@@ -31,12 +34,13 @@ function MyClasses() {
   const navigate = useNavigate();
   const { userInfo } = useAppContext();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [copyLinkModalOpen, setCopyLinkModalOpen] = useState(false);
   const [editCourse, setEditeCourse] = useState({});
   const handleEditClick = (course) => {
     setIsEditModalOpen(true);
     setEditeCourse(course);
   };
-  console.log(classes);
+
   const loadCourses = () => {
     setLoading(true);
     fetch("https://assessment.darkube.app/api/Course/Course", {
@@ -147,14 +151,18 @@ function MyClasses() {
     }
   };
 
-  const handleClassClick = (courseId) => {
-    // navigate(`/class/${courseId}/assessments`);
-  };
+  // const handleClassClick = (courseId) => {
+  //   navigate(`/class/${courseId}/assessments`);
+  // };
   const skeletonCount = classes.length > 0 ? classes.length : 5;
-  console.log(skeletonCount);
+  const handleOpenDialogCopyLink = (course) => {
+    setCopyLinkModalOpen(!copyLinkModalOpen);
+    setEditeCourse(course);
+  };
+  console.log(copyLinkModalOpen);
   return (
     <Grid container gap={2} flexWrap={"wrap"} sx={{ padding: 2 }}>
-      <ToastContainer />
+     
       {loading ? (
         Array.from(new Array(skeletonCount)).map((_, index) => (
           <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
@@ -172,55 +180,67 @@ function MyClasses() {
         <>
           {classes.length > 0 ? (
             <>
-             { classes.map((course) => (
-              <Grid
-                item
-                key={course.courseId}
-                width={{ xs: "100%", sm: "48%", md: "23.8%" }}
-                xs={12}
-                sm={6}
-                md={4}
-                lg={3}
-              >
-                <Card
-                  raised
-                  sx={{
-                    "&:hover": {
-                      transform: "scale(1.05)",
-                      transition: "transform 0.3s",
-                    },
-                  }}
+              {classes.map((course) => (
+                <Grid
+                  item
+                  key={course.courseId}
+                  width={{ xs: "100%", sm: "48%", md: "23.8%" }}
+                  xs={12}
+                  sm={6}
+                  md={4}
+                  lg={3}
                 >
-                  <CardActionArea
-                    onClick={() => handleClassClick(course.courseId)}
+                  <Card
+                    raised
+                    sx={{
+                      "&:hover": {
+                        transform: "scale(1.05)",
+                        transition: "transform 0.3s",
+                      },
+                    }}
                   >
-                    <CardMedia
-                      component="img"
-                      height="140"
-                      image={classroom}
-                      alt={course.title}
-                    />
-                    <CardContent>
-                      <Typography gutterBottom variant="h5" component="div">
-                        {course.title}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {course.description}
-                      </Typography>
-                    </CardContent>
-                  </CardActionArea>
-                  <CardActionArea>
-                    {userInfo?.studentId > 0 ? null : (
-                      <IconButton onClick={() => handleEditClick(course)}>
-                        <EditIcon />
+                    <CardActionArea
+                    // onClick={() => handleClassClick(course.courseId)}
+                    >
+                      <CardMedia
+                        component="img"
+                        height="140"
+                        image={classroom}
+                        alt={course.title}
+                      />
+                      <CardContent>
+                        <Typography gutterBottom variant="h5" component="div">
+                          {course.title}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {course.description}
+                        </Typography>
+                      </CardContent>
+                    </CardActionArea>
+                    <CardActionArea>
+                      {userInfo?.studentId > 0 ? null : (
+                        <IconButton onClick={() => handleEditClick(course)}>
+                          <EditIcon />
+                        </IconButton>
+                      )}
+                      <IconButton onClick={() => handleOpenDialog(course)}>
+                        <DeleteIcon />
                       </IconButton>
-                    )}
-                    <IconButton onClick={() => handleOpenDialog(course)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </CardActionArea>
-                </Card>
-              </Grid>
+                      <Link
+                        to={`http://localhost:3000/myClasses/${course?.courseId}`}
+                      >
+                        <IconButton>
+                          <VisibilityIcon />
+                        </IconButton>
+                      </Link>
+                      <IconButton
+                        onClick={() => handleOpenDialogCopyLink(course)}
+                      >
+                        <CopyAllIcon />
+                      </IconButton>
+                    </CardActionArea>
+                  </Card>
+                </Grid>
               ))}
             </>
           ) : (
@@ -230,24 +250,34 @@ function MyClasses() {
               lineHeight={2}
               color={"red"}
               maxWidth={500}
-              margin={'auto'}
+              margin={"auto"}
             >
               {userInfo?.studentId > 0 ? (
                 <>
                   دانشجوی عزیز جناب آقای {userInfo.name} {userInfo.family} شما
                   عضو هیچ کلاسی نیستید
-
-                  <img src={noClasses}alt="بدون کلاس" style={{width:'100%',borderRadius:'20px',marginTop:'30px'}}/>
+                  <img
+                    src={noClasses}
+                    alt="بدون کلاس"
+                    style={{
+                      width: "100%",
+                      borderRadius: "20px",
+                      marginTop: "30px",
+                    }}
+                  />
                 </>
               ) : (
                 <>
                   استاد عزیز جناب آقای {userInfo.name} {userInfo.family} ضمن خیر
                   مقدم و خوش آمد گویی به شما ,متاسفانه شما تا به کنون هیچ کلاسی
                   رو ایجاد نکرده اید لطفا برای استفاده از سایت و خدمات انلاین
-                  مدیریت تکالیف درسی ,کلاس خود را ایجاد کنید. با تشکر تیم توسعه دهنده
-                  سامانه مدیریت آنلاین تکالیف درسی
-
-                  <img src={noClasses}alt="بدون کلاس" style={{width:'100%',borderRadius:'20px'}}/>
+                  مدیریت تکالیف درسی ,کلاس خود را ایجاد کنید. با تشکر تیم توسعه
+                  دهنده سامانه مدیریت آنلاین تکالیف درسی
+                  <img
+                    src={noClasses}
+                    alt="بدون کلاس"
+                    style={{ width: "100%", borderRadius: "20px" }}
+                  />
                 </>
               )}
             </Typography>
@@ -283,6 +313,11 @@ function MyClasses() {
           />
         </DialogContent>
       </Dialog>
+      <ModaleShareLink
+        copyLinkCourse={editCourse}
+        open={copyLinkModalOpen}
+        onClose={() => setCopyLinkModalOpen(!copyLinkModalOpen)}
+      />
     </Grid>
   );
 }
