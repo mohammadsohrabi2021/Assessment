@@ -227,7 +227,7 @@ function MyClasses() {
                         <DeleteIcon />
                       </IconButton>
                       <Link
-                        to={`http://localhost:3000/myClasses/${course?.courseId}`}
+                        to={`https://assessment-front.darkube.app/myClasses/${course?.courseId}`}
                       >
                         <IconButton>
                           <VisibilityIcon />
