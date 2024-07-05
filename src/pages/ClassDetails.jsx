@@ -144,7 +144,7 @@ function MyClasses() {
               کد ترم : {classData?.result.term}
             </Typography>
             <Typography fontFamily={"iran-sans"} gutterBottom>
-              لینک کلاس : https://assessment-front.darkube.app/
+              لینک کلاس : https://assessment-front.darkube.app/course/JoinClass/
               {classData?.result.link}
             </Typography>
             <Typography fontFamily={"iran-sans"} gutterBottom>
@@ -154,9 +154,10 @@ function MyClasses() {
               ظرفیت باقی مانده از کلاس : {classData?.result.countMembers-classData?.result?.student?.length}
             </Typography>
             <Box mt={3} display="flex" justifyContent="space-between" alignItems={'center'}>
+              {!userInfo?.studentId>0&&
               <Button variant="contained" color="success" sx={{ fontFamily: 'iran-sans' ,height:'max-content'}}onClick={handleOpenCreateAssignmentModal}>
                 ایجاد تکلیف
-              </Button>
+              </Button>}
              
             <Box sx={{  height: 100,transform: "translateZ(0px)", flexGrow: 1 }}>
               <SpeedDial
