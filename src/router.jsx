@@ -16,6 +16,7 @@ import PurchaseSubscription from "./pages/PurchaseSubscription";
 import MidtermQuestions from "./pages/MidtermQuestions";
 import EndQuestions from "./pages/EndQuestions";
 import ClassDetails from "./pages/ClassDetails";
+import JoinClass from "./pages/course/JoinClass";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -74,6 +75,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <ClassDetails />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path:"course/JoinClass/:classId/*",
+        element: (
+          <ProtectedRoute>
+            <JoinClass />
           </ProtectedRoute>
         ),
       },
