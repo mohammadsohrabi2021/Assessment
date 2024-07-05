@@ -88,7 +88,7 @@ function ModaleShareLink({ open, onClose, copyLinkCourse }) {
               variant="body2"
               sx={{ wordWrap: "break-word", marginRight: 1 }}
             >
-              https://assessment-front.darkube.app/{copyLinkCourse?.link}
+              https://assessment-front.darkube.app/course/JoinClass/{copyLinkCourse?.link}
             </Typography>
             <Tooltip title="کپی لینک" >
               <IconButton onClick={handleCopy}>
