@@ -16,7 +16,7 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { Edit, Delete } from "@mui/icons-material";
+import { Edit, Delete, Download } from "@mui/icons-material";
 import { useAppContext } from "../contexts/app/AppContext";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 import { toast } from "react-toastify";
@@ -40,7 +40,6 @@ const VisitModalAssessments = ({ open, onClose, assessments, onEdit, onDelete })
 
   const handleDeleteConfirm = async () => {
     setDeleteDialogOpen(false);
-    console.log(selectedAssessment)
     try {
       const response = await fetch(`https://assessment.darkube.app/api/Assessment/DeleteAssessment`, {
         method: "DELETE",
@@ -63,6 +62,13 @@ const VisitModalAssessments = ({ open, onClose, assessments, onEdit, onDelete })
     }
   };
 
+  const handleDownload = (fileName) => {
+    console.log(fileName)
+    const baseUrl = "https://assessment.s3.ir-thr-at1.arvanstorage.ir/";
+    const fileUrl = `${baseUrl}${fileName}`;
+    window.open(fileUrl, "_blank");
+  };
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>
@@ -82,7 +88,7 @@ const VisitModalAssessments = ({ open, onClose, assessments, onEdit, onDelete })
                   <TableCell>تاریخ شروع</TableCell>
                   <TableCell>تاریخ پایان</TableCell>
                   <TableCell>قوانین جریمه</TableCell>
-                  {userInfo?.studentId > 0 ? null : <TableCell>عملیات</TableCell>}
+                  <TableCell>عملیات</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -101,20 +107,28 @@ const VisitModalAssessments = ({ open, onClose, assessments, onEdit, onDelete })
                     <TableCell>{new Date(assessment.startDate).toLocaleDateString('fa-IR')}</TableCell>
                     <TableCell>{new Date(assessment.endDate).toLocaleDateString('fa-IR')}</TableCell>
                     <TableCell>{assessment.penaltyRule}</TableCell>
-                    {userInfo?.studentId > 0 ? null : (
-                      <TableCell>
-                        <Tooltip title="ویرایش">
-                          <IconButton onClick={() => handleEditClick(assessment)}>
-                            <Edit sx={{color:'green'}}/>
+                    <TableCell>
+                      {userInfo?.studentId > 0 ? (
+                        <Tooltip title="دانلود">
+                          <IconButton onClick={() => handleDownload(assessment.fileName)}>
+                            <Download sx={{ color: 'blue' }} />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="حذف">
-                          <IconButton onClick={() => handleDeleteClick(assessment)}>
-                            <Delete sx={{color:'red'}}/>
-                          </IconButton>
-                        </Tooltip>
-                      </TableCell>
-                    )}
+                      ) : (
+                        <>
+                          <Tooltip title="ویرایش">
+                            <IconButton onClick={() => handleEditClick(assessment)}>
+                              <Edit sx={{ color: 'green' }} />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="حذف">
+                            <IconButton onClick={() => handleDeleteClick(assessment)}>
+                              <Delete sx={{ color: 'red' }} />
+                            </IconButton>
+                          </Tooltip>
+                        </>
+                      )}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
