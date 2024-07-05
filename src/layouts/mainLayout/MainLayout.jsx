@@ -16,7 +16,7 @@ const MainLayout = () => {
     overflowY: "auto",
     overflowX: "hidden",
     height: "100vh",
-    width: "20%",
+    width: "17%",
     scrollbarWidth: "none" /* Firefox */,
     msOverflowStyle: "none" /* Internet Explorer */,
     "&::-webkit-scrollbar": {
