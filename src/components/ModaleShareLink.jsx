@@ -22,7 +22,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 function ModaleShareLink({ open, onClose, copyLinkCourse }) {
   const handleCopy = () => {
-    navigator.clipboard.writeText(`https://assessment-front.darkube.app/${copyLinkCourse?.link}`);
+    navigator.clipboard.writeText(`https://assessment-front.darkube.app/course/JoinClass/${copyLinkCourse?.link}`);
     toast.success("URL شما با موفقیت کپی شد!");
   };
   console.log(copyLinkCourse);
