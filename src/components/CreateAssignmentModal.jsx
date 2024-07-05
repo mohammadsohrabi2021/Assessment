@@ -17,15 +17,28 @@ import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import { toast } from "react-toastify";
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import HelpModal from "./HelpModal";
-import { useAppContext } from '../contexts/app/AppContext'; // مسیر فرضی
+import { useAppContext } from "../contexts/app/AppContext"; // مسیر فرضی
 
-const CreateAssignmentModal = ({ open, onClose, courseId, assessment, reloadClassData }) => {
-  const { control, handleSubmit, reset, setError, setValue, formState: { errors } } = useForm();
+const CreateAssignmentModal = ({
+  open,
+  onClose,
+  courseId,
+  assessment,
+  reloadClassData,
+}) => {
+  const {
+    control,
+    handleSubmit,
+    reset,
+    setError,
+    setValue,
+    formState: { errors },
+  } = useForm();
   const [helpModalOpen, setHelpModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
-const{userInfo}=useAppContext()
+  const { userInfo } = useAppContext();
   useEffect(() => {
     if (assessment) {
       setValue("title", assessment.title);
@@ -37,7 +50,7 @@ const{userInfo}=useAppContext()
       reset(); // Reset form values if no assessment is provided
     }
   }, [assessment, setValue, reset]);
-
+console.log(reloadClassData)
   const onSubmit = async (data) => {
     const penaltyRulePattern = /(\d+[hd] \d+)/;
     if (!penaltyRulePattern.test(data.penaltyRule)) {
@@ -51,22 +64,25 @@ const{userInfo}=useAppContext()
     const formattedStartDate = data.startDate.toISOString().split("T")[0];
     const formattedEndDate = data.endDate.toISOString().split("T")[0];
     const method = assessment ? "PUT" : "POST";
-    const endpoint = assessment 
-      ? `https://assessment.darkube.app/api/Assessment/UpdateAssessment?AssessmentId=${assessment.assessmentId}&CourseId=${courseId}&Title=${data.title}&Description=${data.description}&StartDate=${formattedStartDate}&EndDate=${formattedEndDate}&PenaltyRule=${data.penaltyRule}`
-      : `https://assessment.darkube.app/api/Assessment/CreateAssessment?CourseId=${courseId?.courseId}&Title=${data.title}&Description=${data.description}&StartDate=${formattedStartDate}&EndDate=${formattedEndDate}&PenaltyRule=${data.penaltyRule}`;
+    const endpoint = assessment
+      ? `https://assessment.darkube.app/api/Assessment/UpdateAssessment?AssessmentId=${assessment.assessmentId}&CourseId=${courseId}&Title=${data.title}&Description=${data.description}&StartDate=${formattedStartDate}&EndDate=${formattedEndDate}&FileName=${assessment?.fileName}&&PenaltyRule=${data.penaltyRule}`
+      : `https://assessment.darkube.app/api/Assessment/CreateAssessment?CourseId=${courseId?.result?.courseId}&Title=${data.title}&Description=${data.description}&StartDate=${formattedStartDate}&EndDate=${formattedEndDate}&PenaltyRule=${data.penaltyRule}`;
 
     try {
       const formData = new FormData();
-      formData.append('CourseId', courseId?.courseId);
-      formData.append('Title', data.title);
-      formData.append('Description', data.description);
-      formData.append('StartDate', formattedStartDate);
-      formData.append('EndDate', formattedEndDate);
-      formData.append('PenaltyRule', data.penaltyRule);
+      formData.append(
+        "CourseId",
+        method === "PUT" ? courseId : courseId?.result?.courseId
+      );
+      formData.append("Title", data.title);
+      formData.append("Description", data.description);
+      formData.append("StartDate", formattedStartDate);
+      formData.append("EndDate", formattedEndDate);
+      formData.append("PenaltyRule", data.penaltyRule);
       if (selectedFile) {
-        formData.append('File', selectedFile);
+        formData.append("File", selectedFile);
       }
-console.log(selectedFile,'selectedFile')
+
       const response = await fetch(endpoint, {
         method,
         headers: {
@@ -76,17 +92,26 @@ console.log(selectedFile,'selectedFile')
       });
 
       if (response.ok) {
-        toast.success(`تمرین با موفقیت ${assessment ? "به‌روزرسانی" : "ایجاد"} شد!`);
+        toast.success(
+          `تمرین با موفقیت ${assessment ? "به‌روزرسانی" : "ایجاد"} شد!`
+        );
         reset(); // Clear form data
         onClose();
         reloadClassData();
       } else {
         const errorData = await response.json();
-        toast.error(`خطا در ${assessment ? "به‌روزرسانی" : "ایجاد"} تمرین: ${errorData.message}`);
+        toast.error(
+          `خطا در ${assessment ? "به‌روزرسانی" : "ایجاد"} تمرین: ${
+            errorData.message
+          }`
+        );
       }
     } catch (error) {
-      console.error(`Error ${assessment ? "updating" : "creating"} assignment:`, error);
-      toast.error("خطا در ارتباط با سرور");
+      console.error(
+        `Error ${assessment ? "updating" : "creating"} assignment:`,
+        error
+      );
+      // toast.error("خطا در ارتباط با سرور");
     }
   };
 
@@ -101,7 +126,9 @@ console.log(selectedFile,'selectedFile')
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>
-        <Typography fontFamily={'iran-sans'}>{assessment ? "ویرایش تکلیف" : "ایجاد تکلیف جدید"}</Typography>
+        <Typography fontFamily={"iran-sans"}>
+          {assessment ? "ویرایش تکلیف" : "ایجاد تکلیف جدید"}
+        </Typography>
       </DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -139,7 +166,7 @@ console.log(selectedFile,'selectedFile')
                 )}
               />
             </Grid>
-            <Grid display={'flex'} gap={2}>
+            <Grid display={"flex"} gap={2}>
               <Grid item xs={6} sm={6}>
                 <Controller
                   name="startDate"
@@ -211,9 +238,18 @@ console.log(selectedFile,'selectedFile')
                               sx={{
                                 animation: "pulse 2s infinite",
                                 "@keyframes pulse": {
-                                  "0%": { transform: "scale(1)", backgroundColor: "transparent" },
-                                  "50%": { transform: "scale(1.1)", backgroundColor: "rgba(255, 0, 0, 0.2)" },
-                                  "100%": { transform: "scale(1)", backgroundColor: "transparent" },
+                                  "0%": {
+                                    transform: "scale(1)",
+                                    backgroundColor: "transparent",
+                                  },
+                                  "50%": {
+                                    transform: "scale(1.1)",
+                                    backgroundColor: "rgba(255, 0, 0, 0.2)",
+                                  },
+                                  "100%": {
+                                    transform: "scale(1)",
+                                    backgroundColor: "transparent",
+                                  },
                                 },
                               }}
                             >
@@ -242,13 +278,26 @@ console.log(selectedFile,'selectedFile')
                 )}
               />
             </Grid>
-            <HelpModal open={helpModalOpen} onClose={() => setHelpModalOpen(!helpModalOpen)} />
+            <HelpModal
+              open={helpModalOpen}
+              onClose={() => setHelpModalOpen(!helpModalOpen)}
+            />
           </Grid>
-          <DialogActions sx={{ gap: '30px' }}>
-            <Button onClick={onClose} sx={{ fontFamily: 'iran-sans' }} color="error" variant="contained">
+          <DialogActions sx={{ gap: "30px" }}>
+            <Button
+              onClick={onClose}
+              sx={{ fontFamily: "iran-sans" }}
+              color="error"
+              variant="contained"
+            >
               لغو
             </Button>
-            <Button type="submit" sx={{ fontFamily: 'iran-sans' }} color="success" variant="contained">
+            <Button
+              type="submit"
+              sx={{ fontFamily: "iran-sans" }}
+              color="success"
+              variant="contained"
+            >
               {assessment ? "به‌روزرسانی" : "ایجاد"}
             </Button>
           </DialogActions>
