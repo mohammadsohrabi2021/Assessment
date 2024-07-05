@@ -15,6 +15,7 @@ import OnlineExamProgram from "./pages/OnlineExamProgram";
 import PurchaseSubscription from "./pages/PurchaseSubscription";
 import MidtermQuestions from "./pages/MidtermQuestions";
 import EndQuestions from "./pages/EndQuestions";
+import ClassDetails from "./pages/ClassDetails";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -65,6 +66,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <MyClasses />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "myClasses/:classId/*",
+        element: (
+          <ProtectedRoute>
+            <ClassDetails />
           </ProtectedRoute>
         ),
       },
