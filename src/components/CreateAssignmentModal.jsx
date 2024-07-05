@@ -19,18 +19,13 @@ import persian_fa from "react-date-object/locales/persian_fa";
 import { toast } from "react-toastify";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import HelpModal from "./HelpModal";
+import { useAppContext } from '../contexts/app/AppContext'; // مسیر فرضی
 
 const CreateAssignmentModal = ({ open, onClose, courseId, assessment, reloadClassData }) => {
-  const {
-    control,
-    handleSubmit,
-    reset,
-    setError,
-    setValue,
-    formState: { errors },
-  } = useForm();
+  const { control, handleSubmit, reset, setError, setValue, formState: { errors } } = useForm();
   const [helpModalOpen, setHelpModalOpen] = useState(false);
-
+  const [selectedFile, setSelectedFile] = useState(null);
+const{userInfo}=useAppContext()
   useEffect(() => {
     if (assessment) {
       setValue("title", assessment.title);
@@ -61,12 +56,23 @@ const CreateAssignmentModal = ({ open, onClose, courseId, assessment, reloadClas
       : `https://assessment.darkube.app/api/Assessment/CreateAssessment?CourseId=${courseId?.courseId}&Title=${data.title}&Description=${data.description}&StartDate=${formattedStartDate}&EndDate=${formattedEndDate}&PenaltyRule=${data.penaltyRule}`;
 
     try {
+      const formData = new FormData();
+      formData.append('CourseId', courseId?.courseId);
+      formData.append('Title', data.title);
+      formData.append('Description', data.description);
+      formData.append('StartDate', formattedStartDate);
+      formData.append('EndDate', formattedEndDate);
+      formData.append('PenaltyRule', data.penaltyRule);
+      if (selectedFile) {
+        formData.append('File', selectedFile);
+      }
+console.log(selectedFile,'selectedFile')
       const response = await fetch(endpoint, {
         method,
         headers: {
-          "Content-Type": "application/json",
+          Authorization: `Bearer ${userInfo.token}`,
         },
-        body: JSON.stringify(data),
+        body: formData,
       });
 
       if (response.ok) {
@@ -82,6 +88,10 @@ const CreateAssignmentModal = ({ open, onClose, courseId, assessment, reloadClas
       console.error(`Error ${assessment ? "updating" : "creating"} assignment:`, error);
       toast.error("خطا در ارتباط با سرور");
     }
+  };
+
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files[0]);
   };
 
   const handleHelpClick = () => {
@@ -224,10 +234,10 @@ const CreateAssignmentModal = ({ open, onClose, courseId, assessment, reloadClas
                 defaultValue=""
                 render={({ field }) => (
                   <input
-                    {...field}
                     type="file"
                     accept="image/*,application/pdf"
                     style={{ display: "block", marginTop: "16px" }}
+                    onChange={handleFileChange}
                   />
                 )}
               />
