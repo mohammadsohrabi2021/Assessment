@@ -15,7 +15,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper
+  Paper,
+  Link
 } from '@mui/material';
 import { toast } from 'react-toastify';
 import { useAppContext } from '../contexts/app/AppContext';
@@ -41,7 +42,7 @@ const AssignmentSubmissionsModal = ({ open, onClose, assignmentId }) => {
         if (response.ok) {
           const data = await response.json();
           console.log('Fetched submissions:', data); // Debugging
-          setSubmissions(data);
+          setSubmissions(data.result);
         } else {
           console.error('Error fetching submissions:', response.statusText);
         }
@@ -74,9 +75,17 @@ const AssignmentSubmissionsModal = ({ open, onClose, assignmentId }) => {
           score: score[asId],
         }),
       });
-
+console.log(response)
       if (response.ok) {
         toast.success('نمره با موفقیت ثبت شد!');
+        // به‌روزرسانی نمره ثبت شده در جدول
+        setSubmissions((prev) =>
+          prev.map((submission) =>
+            submission.aS_Id === asId
+              ? { ...submission, rawScore: score[asId] }
+              : submission
+          )
+        );
       } else {
         const errorData = await response.json();
         toast.error(`خطا در ثبت نمره: ${errorData.message}`);
@@ -93,44 +102,56 @@ const AssignmentSubmissionsModal = ({ open, onClose, assignmentId }) => {
       <DialogContent>
         {loading ? (
           <CircularProgress />
-        ) : submissions?.result.length > 0 ? (
+        ) : submissions.length > 0 ? (
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
                 <TableRow>
                   <TableCell>شماره</TableCell>
                   <TableCell>دانشجو</TableCell>
-                  <TableCell>پاسخ</TableCell>
+                  <TableCell>پاسخ تشریحی</TableCell>
+                  <TableCell>پاسخ فایلی</TableCell>
                   <TableCell>نمره</TableCell>
+                  <TableCell>نمره ثبت شده</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {submissions?.result.map((submission, index) => (
-                  <TableRow key={submission.id}>
+                {submissions.map((submission, index) => (
+                  <TableRow key={submission.aS_Id}>
                     <TableCell>{index + 1}</TableCell>
-                    <TableCell>{submission.studentName}</TableCell>
+                    <TableCell>{`${submission.student.name} ${submission.student.family}`}</TableCell>
                     <TableCell>{submission.text || 'بدون پاسخ متنی'}</TableCell>
+                    <TableCell>
+                      {submission.fileName ? (
+                        <Link href={`https://assessment.s3.ir-thr-at1.arvanstorage.ir/${submission.fileName}`} target="_blank" rel="noopener noreferrer">
+                          دانلود فایل
+                        </Link>
+                      ) : (
+                        'بدون فایل'
+                      )}
+                    </TableCell>
                     <TableCell>
                       <Grid container spacing={1}>
                         <Grid item xs={8}>
                           <TextField
                             fullWidth
                             type="number"
-                            value={score[submission.id] || ''}
-                            onChange={(e) => handleScoreChange(e, submission.id)}
+                            value={score[submission.aS_Id] || ''}
+                            onChange={(e) => handleScoreChange(e, submission.aS_Id)}
                           />
                         </Grid>
                         <Grid item xs={4}>
                           <Button
                             variant="contained"
                             color="primary"
-                            onClick={() => handleScoreSubmit(submission.id)}
+                            onClick={() => handleScoreSubmit(submission.aS_Id)}
                           >
                             ثبت
                           </Button>
                         </Grid>
                       </Grid>
                     </TableCell>
+                    <TableCell>{submission.rawScore || 'بدون نمره'}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
