@@ -16,16 +16,18 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { Edit, Delete, Download } from "@mui/icons-material";
+import { Edit, Delete, Download, Upload } from "@mui/icons-material";
 import { useAppContext } from "../contexts/app/AppContext";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 import { toast } from "react-toastify";
-import CreateAssignmentModal from "./CreateAssignmentModal"; // ایمپورت مودال ساخت تمرین
+import CreateAssignmentModal from "./CreateAssignmentModal";
+import UploadAssignmentModal from "./UploadAssignmentModal"; // ایمپورت مودال آپلود
 
 const VisitModalAssessments = ({ open, onClose, assessments, onEdit, onDelete }) => {
   const { userInfo } = useAppContext();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false); // استیت برای باز و بسته کردن مودال ویرایش
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false); // استیت برای باز و بسته کردن مودال آپلود
   const [selectedAssessment, setSelectedAssessment] = useState(null);
 
   const handleDeleteClick = (assessment) => {
@@ -36,6 +38,11 @@ const VisitModalAssessments = ({ open, onClose, assessments, onEdit, onDelete })
   const handleEditClick = (assessment) => {
     setSelectedAssessment(assessment);
     setEditModalOpen(true);
+  };
+
+  const handleUploadClick = (assessment) => {
+    setSelectedAssessment(assessment);
+    setUploadModalOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
@@ -63,7 +70,6 @@ const VisitModalAssessments = ({ open, onClose, assessments, onEdit, onDelete })
   };
 
   const handleDownload = (fileName) => {
-    console.log(fileName)
     const baseUrl = "https://assessment.s3.ir-thr-at1.arvanstorage.ir/";
     const fileUrl = `${baseUrl}${fileName}`;
     window.open(fileUrl, "_blank");
@@ -109,11 +115,18 @@ const VisitModalAssessments = ({ open, onClose, assessments, onEdit, onDelete })
                     <TableCell>{assessment.penaltyRule}</TableCell>
                     <TableCell>
                       {userInfo?.studentId > 0 ? (
-                        <Tooltip title="دانلود">
-                          <IconButton onClick={() => handleDownload(assessment.fileName)}>
-                            <Download sx={{ color: 'blue' }} />
-                          </IconButton>
-                        </Tooltip>
+                        <>
+                          <Tooltip title="دانلود">
+                            <IconButton onClick={() => handleDownload(assessment.fileName)}>
+                              <Download sx={{ color: 'blue' }} />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="آپلود">
+                            <IconButton onClick={() => handleUploadClick(assessment)}>
+                              <Upload sx={{ color: 'orange' }} />
+                            </IconButton>
+                          </Tooltip>
+                        </>
                       ) : (
                         <>
                           <Tooltip title="ویرایش">
@@ -155,8 +168,13 @@ const VisitModalAssessments = ({ open, onClose, assessments, onEdit, onDelete })
         open={editModalOpen}
         onClose={() => setEditModalOpen(false)}
         courseId={selectedAssessment?.courseId}
-        assessment={selectedAssessment} // ارسال داده‌های تمرین به مودال
-        reloadClassData={onEdit} // تغییر نام به onEdit برای سازگاری با فانکشن ارسال شده
+        assessment={selectedAssessment}
+        reloadClassData={onEdit}
+      />
+      <UploadAssignmentModal
+        open={uploadModalOpen}
+        onClose={() => setUploadModalOpen(false)}
+        assessment={selectedAssessment}
       />
     </Dialog>
   );
