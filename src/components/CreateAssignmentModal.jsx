@@ -16,7 +16,7 @@ import { useForm, Controller } from "react-hook-form";
 import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
-import { toast } from "react-toastify";
+import { ToastContainer,toast } from "react-toastify";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import HelpModal from "./HelpModal";
 import { useAppContext } from "../contexts/app/AppContext"; // مسیر فرضی
@@ -39,6 +39,7 @@ const CreateAssignmentModal = ({
   const [helpModalOpen, setHelpModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const { userInfo } = useAppContext();
+  console.log(assessment?.penaltyRule)
   useEffect(() => {
     if (assessment) {
       setValue("title", assessment.title);
@@ -47,32 +48,32 @@ const CreateAssignmentModal = ({
       setValue("endDate", new Date(assessment.endDate));
       setValue("penaltyRule", assessment.penaltyRule);
     } else {
-      reset(); // Reset form values if no assessment is provided
+      reset({ penaltyRule: "1d 80n2d 70n3d 50" });
     }
   }, [assessment, setValue, reset]);
-console.log(reloadClassData)
+  
   const onSubmit = async (data) => {
-    const penaltyRulePattern = /(\d+[hd] \d+)/;
+    const penaltyRulePattern = /^(?:\d+d \d+(?:n)?)(?:n\d+d \d+(?:n)?)*$/;
     if (!penaltyRulePattern.test(data.penaltyRule)) {
       setError("penaltyRule", {
         type: "manual",
-        message: "قانون جریمه مطابق با فرمت مورد نظر نیست: 1d 70, 2d 50",
+        message: "قانون جریمه مطابق با فرمت مورد نظر نیست: 1d 80n2d 70n3d 50",
       });
       return;
     }
-
+   
     const formattedStartDate = data.startDate.toISOString().split("T")[0];
     const formattedEndDate = data.endDate.toISOString().split("T")[0];
     const method = assessment ? "PUT" : "POST";
     const endpoint = assessment
-      ? `https://assessment.darkube.app/api/Assessment/UpdateAssessment?AssessmentId=${assessment.assessmentId}&CourseId=${courseId}&Title=${data.title}&Description=${data.description}&StartDate=${formattedStartDate}&EndDate=${formattedEndDate}&FileName=${assessment?.fileName}&&PenaltyRule=${data.penaltyRule}`
+      ? `https://assessment.darkube.app/api/Assessment/UpdateAssessment?AssessmentId=${assessment.assessmentId}&CourseId=${courseId?.courseId}&Title=${data.title}&Description=${data.description}&StartDate=${formattedStartDate}&EndDate=${formattedEndDate}&FileName=${assessment?.fileName}&&PenaltyRule=${data.penaltyRule}`
       : `https://assessment.darkube.app/api/Assessment/CreateAssessment?CourseId=${courseId?.result?.courseId}&Title=${data.title}&Description=${data.description}&StartDate=${formattedStartDate}&EndDate=${formattedEndDate}&PenaltyRule=${data.penaltyRule}`;
 
     try {
       const formData = new FormData();
       formData.append(
         "CourseId",
-        method === "PUT" ? courseId : courseId?.result?.courseId
+        method === "PUT" ? courseId : courseId?.courseId
       );
       formData.append("Title", data.title);
       formData.append("Description", data.description);
@@ -82,7 +83,7 @@ console.log(reloadClassData)
       if (selectedFile) {
         formData.append("File", selectedFile);
       }
-
+     
       const response = await fetch(endpoint, {
         method,
         headers: {
@@ -90,8 +91,12 @@ console.log(reloadClassData)
         },
         body: formData,
       });
-
-      if (response.ok) {
+      console.log(response);
+      if (response.status === 403) {
+        toast.warning(
+         "تاریخ پایان نمیتواند قبل از تاریخ شروع باشد"
+        );
+      } else if (response.ok) {
         toast.success(
           `تمرین با موفقیت ${assessment ? "به‌روزرسانی" : "ایجاد"} شد!`
         );
@@ -100,6 +105,7 @@ console.log(reloadClassData)
         reloadClassData();
       } else {
         const errorData = await response.json();
+        console.log(errorData);
         toast.error(
           `خطا در ${assessment ? "به‌روزرسانی" : "ایجاد"} تمرین: ${
             errorData.message
