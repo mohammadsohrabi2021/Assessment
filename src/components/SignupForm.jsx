@@ -32,6 +32,7 @@ function SignupForm({ onCancel, type, roleId }) {
   const [options, setOptions] = useState([]);
   const [selectedOption, setSelectedOption] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // وضعیت جدید برای نشان دادن ارسال فرم
   const [formData, setFormData] = useState({
     name: "",
     family: "",
@@ -79,7 +80,7 @@ function SignupForm({ onCancel, type, roleId }) {
       setErrors(newErrors);
       return;
     }
-
+    setIsSubmitting(true);
     const apiUrl =
       type === "استاد"
         ? "/Account/RegisterTeacher"
@@ -95,9 +96,12 @@ function SignupForm({ onCancel, type, roleId }) {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data, "data");
+        setIsSubmitting(false); 
         if (data.statusCode == 200) {
-          toast.success("ثبت نام شما باموفقیت انجام شد");
+          toast.success(data?.message);
+          navigate("/account/login");
+        }else if(data.statusCode == 403){
+          toast.warning(data?.message);
           navigate("/account/login");
         } else {
           toast.error(data.message);
@@ -348,11 +352,12 @@ function SignupForm({ onCancel, type, roleId }) {
                 type="submit"
                 style={{ backgroundColor: "hotpink", color: "#fff" }}
               >
-                ثبت نام
+               {isSubmitting? <CircularProgress size={24}/>:' ثبت نام'}
               </Button>
             </Grid>
             <Grid item xs={6} width={'50%'}>
               <Button
+              disabled={isSubmitting}
                 onClick={onCancel}
                 variant="contained"
                 fullWidth
