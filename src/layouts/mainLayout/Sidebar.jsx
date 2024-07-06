@@ -1,23 +1,32 @@
 import logo from "@assets/images/logo.png";
-
 import { useAppContext } from "../../contexts/app/AppContext";
 import { Link, NavLink } from "react-router-dom";
 import { Grid, Typography } from "@mui/material";
 import muneItemSideBar from "../../data/muneItemSideBar";
 
 const Sidebar = () => {
-  const { showSidebar, toggleSidebar,userInfo } = useAppContext();
+  const { showSidebar, toggleSidebar, userInfo } = useAppContext();
+
   const filteredMuneItemSideBar = muneItemSideBar.map((section) => {
-    if (section.id === 1) {
-      return {
-        ...section,
-        mune: section.mune.filter(
-          (item) => !(userInfo?.studentId > 0 && item.id === 3)
-        ),
-      };
+    let filteredMune = section.mune;
+
+    // فیلتر آیتم "ایجاد کلاس جدید" برای دانشجو
+    if (userInfo?.studentId > 0) {
+      filteredMune = filteredMune.filter((item) => item.id !== 3);
     }
-    return section;
+
+    // فیلتر آیتم "کارنامه من" برای استاد
+    if (userInfo?.roleId === 1) {
+      filteredMune = filteredMune.filter((item) => item.id !== 16);
+    }
+
+    return {
+      ...section,
+      mune: filteredMune,
+    };
   });
+
+  console.log(filteredMuneItemSideBar);
 
   return (
     <Grid
