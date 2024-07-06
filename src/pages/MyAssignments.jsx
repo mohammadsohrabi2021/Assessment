@@ -40,7 +40,7 @@ function MyAssignments() {
     setSelectedAssignment(assignmentId);
     setModalOpen(true);
   };
-
+console.log(assignments?.result)
   return (
     <Grid container spacing={2}>
       {loading ? (
@@ -61,7 +61,7 @@ function MyAssignments() {
             <Card onClick={() => handleCardClick(assignment.assessmentId)}>
               <CardActionArea>
                 <CardContent>
-                  <Typography variant="h6">{assignment.title}</Typography>
+                  <Typography variant="h6" fontFamily={'iran-sans'}>{assignment?.courseTitle}-{assignment.title}</Typography>
                   <Typography>{assignment.description}</Typography>
                   <Typography>تاریخ شروع: {new Date(assignment.startDate).toLocaleDateString('fa-IR')}</Typography>
                   <Typography>تاریخ پایان: {new Date(assignment.endDate).toLocaleDateString('fa-IR')}</Typography>
