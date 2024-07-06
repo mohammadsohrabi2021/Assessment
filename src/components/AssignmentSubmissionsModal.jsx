@@ -145,7 +145,11 @@ const AssignmentSubmissionsModal = ({ open, onClose, assignmentId }) => {
       toast.error("خطا در ارتباط با سرور");
     }
   };
-  console.log(userInfo?.studentId > 0);
+  console.log(assignmentId)
+  console.log(assignments);
+  const filteredAssignments = assignments.filter(
+    (assignment) => assignment.assessmentId === assignmentId
+  );
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>
@@ -167,7 +171,7 @@ const AssignmentSubmissionsModal = ({ open, onClose, assignmentId }) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {assignments.map((assignment) => (
+                {filteredAssignments.map((assignment) => (
                   <TableRow key={assignment.assessmentId}>
                     <TableCell>{assignment.title}</TableCell>
                     <TableCell>{assignment.description}</TableCell>
