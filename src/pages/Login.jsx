@@ -8,6 +8,7 @@ import {
   FormControlLabel,
   Container,
   Grid,
+  CircularProgress
 } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LockIcon from "@mui/icons-material/Lock";
@@ -15,16 +16,20 @@ import PersonIcon from "@mui/icons-material/Person";
 import Cookies from 'js-cookie';
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../contexts/app/AppContext";
+import { toast } from "react-toastify";
 
 function Login() {
   const [codeMelli, setCodeMelli] = useState(""); // تغییر از username به codeMelli
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // وضعیت جدید برای نشان دادن ارسال فرم
+
   const navigate = useNavigate();
   const { setUserInfo } = useAppContext();
   
   const handleLogin = async (event) => {
     event.preventDefault();
+    setIsSubmitting(true); 
     try {
       const response = await fetch("https://assessment.darkube.app/api/Account/Login", {
         method: 'POST',
@@ -40,8 +45,20 @@ function Login() {
         throw new Error('Login failed');
       }
       const data = await response.json();
-      
-      Cookies.set('token', data?.result?.token, { expires: 7 }); // Set token in cookies with 7 days expiration
+      console.log(data)
+      if (data?.statusCode==200) {
+        if (data?.result?.roleId==1) {
+          toast.success(`استاد عزیز جناب آقای ${data?.result?.name} ${data?.result?.family} به سامانه خوش آمدید`)
+        }
+        else{
+          toast.success(`دانشجوی عزیز جناب آقای ${data?.result?.name} ${data?.result?.family} به سامانه خوش آمدید`)
+        }
+        Cookies.set('token', data?.result?.token, { expires: 7 }); // Set token in cookies with 7 days expiration
+       
+      }
+      else{
+        toast.error(data?.message)
+      }
       if (rememberMe) {
         localStorage.setItem('codeMelli', codeMelli); // ذخیره codeMelli در localStorage
         localStorage.setItem('password', password);
@@ -56,6 +73,8 @@ function Login() {
       }
     } catch (error) {
       console.error("Login failed:", error);
+    } finally {
+      setIsSubmitting(false); // تنظیم وضعیت ارسال به false
     }
   };
 
@@ -110,7 +129,7 @@ function Login() {
           variant="contained"
           sx={{ backgroundColor: "#ff1493", ":hover": { backgroundColor: "#ff1493" }, mb: 2 }}
         >
-          ورود
+          {isSubmitting ? <CircularProgress size={24}/>:'ورود'}
         </Button>
         <Grid container justifyContent="space-between">
           <Typography variant="body2" sx={{ color: "#fff" }}>
