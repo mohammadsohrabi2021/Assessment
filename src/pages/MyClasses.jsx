@@ -162,7 +162,7 @@ function MyClasses() {
   console.log(copyLinkModalOpen);
   return (
     <Grid container gap={2} flexWrap={"wrap"} sx={{ padding: 2 }}>
-     
+     <ToastContainer/>
       {loading ? (
         Array.from(new Array(skeletonCount)).map((_, index) => (
           <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
