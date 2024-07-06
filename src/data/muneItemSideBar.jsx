@@ -7,7 +7,8 @@ const muneItemSideBar = [
         { id: 5, name:" پروفایل", href: "/profile", icon: "" },
         { id: 3, name: "ایجاد کلاس جدید", href: "/createNewClass", icon: "" },
         { id: 4, name: "کلاس های من", href: "/myClasses", icon: "" },
-        { id: 5, name: "تکالیف من", href: "/myAssignments", icon: "" },
+        { id: 15, name: "تکالیف من", href: "/myAssignments", icon: "" },
+        { id: 16, name: "کارنامه من", href: "/myRecord", icon: "" },
         
       ],
     },
