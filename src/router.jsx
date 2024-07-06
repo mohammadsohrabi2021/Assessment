@@ -17,6 +17,7 @@ import MidtermQuestions from "./pages/MidtermQuestions";
 import EndQuestions from "./pages/EndQuestions";
 import ClassDetails from "./pages/ClassDetails";
 import JoinClass from "./pages/course/JoinClass";
+import MyRecord from "./pages/MyRecord";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -83,6 +84,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <JoinClass />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "myRecord",
+        element: (
+          <ProtectedRoute>
+            <MyRecord />
           </ProtectedRoute>
         ),
       },
