@@ -62,12 +62,25 @@ const MyRecord = () => {
 
   const { student, scores, scoreAvrge } = report;
 
+  const getStatus = (score) => {
+    if (score === 0) return 'غیر قابل قبول';
+    if (score > 0 && score < 20) return 'غیر قابل قبول';
+    if (score >= 20 && score < 50) return 'قابل قبول';
+    if (score >= 50 && score < 80) return 'خوب';
+    if (score >= 80 && score <= 100) return 'عالی';
+  };
+
+  const groupedScores = scores.reduce((acc, score) => {
+    (acc[score.termId] = acc[score.termId] || []).push(score);
+    return acc;
+  }, {});
+
   return (
     <Grid container justifyContent="center" alignItems="center" style={{ minHeight: '100vh' }} spacing={3}>
       <Grid item xs={12} md={8}>
         <Paper elevation={3} style={{ padding: '20px', borderRadius: '10px' }}>
-          <Box mb={3}>
-            <Typography variant="h5" align="center" gutterBottom>
+          <Box mb={3} textAlign="center">
+            <Typography variant="h4" gutterBottom>
               کارنامه دانشجو
             </Typography>
           </Box>
@@ -78,28 +91,34 @@ const MyRecord = () => {
             <Typography>شماره تلفن: {student.phoneNumber}</Typography>
             <Typography>ایمیل: {student.email}</Typography>
           </Box>
-          <Box mb={3}>
-            <Typography variant="h6">نمرات:</Typography>
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>عنوان درس</TableCell>
-                    <TableCell align="right">نمره</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {scores.map((score, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{score.courseTitle}</TableCell>
-                      <TableCell align="right">{score.lastScore}</TableCell>
+          {Object.entries(groupedScores).map(([termId, termScores]) => (
+            <Box mb={3} key={termId}>
+              <Typography variant="h6" gutterBottom>
+                ترم: {termId}
+              </Typography>
+              <TableContainer component={Paper}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>عنوان درس</TableCell>
+                      <TableCell align="right">نمره</TableCell>
+                      <TableCell align="right">وضعیت</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Box>
-          <Box>
+                  </TableHead>
+                  <TableBody>
+                    {termScores.map((score, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{score.courseTitle}</TableCell>
+                        <TableCell align="right">{score.lastScore}</TableCell>
+                        <TableCell align="right">{getStatus(score.lastScore)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+          ))}
+          <Box textAlign="center">
             <Typography variant="h6">میانگین نمرات:</Typography>
             <Typography variant="h4" align="center" color="primary">
               {scoreAvrge}
